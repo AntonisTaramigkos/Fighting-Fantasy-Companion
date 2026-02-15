@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fighting Fantasy Manager</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- LANDING -->
+  <section id="screen-landing" class="screen active">
+    <div class="hero hero-art">
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <h1 class="hero-title">Fighting Fantasy Manager</h1>
+        <p class="hero-subtitle">Offline • Local saves • Adventure Sheet + Encounters</p>
+
+        <div class="hero-actions small">
+          <button id="btnLandingNew" class="primary">New Game</button>
+          <button id="btnLandingLoad">Load Game</button>
+          <button id="btnLandingExit" class="danger">Exit</button>
+        </div>
+
+        <div id="landingHint" class="hint center"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW GAME -->
+  <section id="screen-newgame" class="screen">
+    <header class="app-header">
+      <div class="title">
+        <h1>New Game</h1>
+        <p class="subtitle">Enter a name, roll your stats, then continue.</p>
+      </div>
+      <div class="toolbar">
+        <button id="btnBackToLanding">Back</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="card">
+        <h2>Character</h2>
+
+        <div class="row">
+          <input id="playerNameInput" type="text" placeholder="Character name (e.g., Arkon)" />
+          <button id="btnStartFresh" class="primary">Start Fresh</button>
+        </div>
+        <p class="hint">Start Fresh clears the current save and prepares a new adventure.</p>
+
+        <hr />
+
+        <div class="grid two">
+          <div class="card inner">
+            <h3>SKILL</h3>
+            <p class="hint">1d6 + 6</p>
+
+            <div class="dice-row">
+              <div class="dice-box">
+                <div class="dice-label">d6</div>
+                <div id="diceSkill" class="dice-face">—</div>
+              </div>
+              <div class="dice-result">
+                <div class="small-muted">Initial / Current</div>
+                <div id="skillOut" class="dice-total">—</div>
+              </div>
+            </div>
+
+            <button id="btnRollSkill" class="primary">Roll SKILL</button>
+          </div>
+
+          <div class="card inner">
+            <h3>STAMINA</h3>
+            <p class="hint">2d6 + 12</p>
+
+            <div class="dice-row">
+              <div class="dice-box">
+                <div class="dice-label">d6</div>
+                <div id="diceStam1" class="dice-face">—</div>
+              </div>
+              <div class="dice-box">
+                <div class="dice-label">d6</div>
+                <div id="diceStam2" class="dice-face">—</div>
+              </div>
+              <div class="dice-result">
+                <div class="small-muted">Initial / Current</div>
+                <div id="staminaOut" class="dice-total">—</div>
+              </div>
+            </div>
+
+            <button id="btnRollStamina" class="primary">Roll STAMINA</button>
+          </div>
+
+          <div class="card inner">
+            <h3>LUCK</h3>
+            <p class="hint">1d6 + 6</p>
+
+            <div class="dice-row">
+              <div class="dice-box">
+                <div class="dice-label">d6</div>
+                <div id="diceLuck" class="dice-face">—</div>
+              </div>
+              <div class="dice-result">
+                <div class="small-muted">Initial / Current</div>
+                <div id="luckOut" class="dice-total">—</div>
+              </div>
+            </div>
+
+            <button id="btnRollLuck" class="primary">Roll LUCK</button>
+          </div>
+
+          <div class="card inner">
+            <h3>Finish</h3>
+            <p id="newgameStatus" class="hint">Roll all three stats to continue.</p>
+
+            <div class="row">
+              <button id="btnRollAll" class="primary">Roll All</button>
+              <button id="btnContinueToGame" class="big" disabled>Continue</button>
+            </div>
+
+            <p class="hint">You can re-roll before continuing.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- MAIN APP -->
+  <section id="screen-app" class="screen">
+    <header class="app-header">
+      <div class="title">
+        <h1>Fighting Fantasy Manager</h1>
+        <p id="playerBanner" class="subtitle">—</p>
+      </div>
+
+      <div class="toolbar">
+        <button id="btnHome">Home</button>
+        <button id="btnNewAdventure" class="danger">New Adventure</button>
+        <button id="btnDice" class="primary">🎲 Dice</button>
+        <button id="btnExport">Export Save</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="sheet">Adventure Sheet</button>
+      <button class="tab" data-tab="encounters">Monster Encounters</button>
+    </nav>
+
+    <main class="container">
+      <!-- ADVENTURE SHEET -->
+      <section id="tab-sheet" class="panel active">
+        <div class="card">
+          <div class="card-header">
+            <h2>Adventure Sheet</h2>
+            <button id="btnRollStats" class="primary">Roll Initial Stats</button>
+          </div>
+
+          <div class="grid two">
+            <div class="stat">
+              <h3>SKILL</h3>
+              <div class="stat-row">
+                <div class="stat-col">
+                  <span class="label">Initial</span>
+                  <span id="skillInitial" class="value">—</span>
+                </div>
+                <div class="stat-col">
+                  <span class="label">Current</span>
+                  <div class="stepper">
+                    <button class="step" data-action="dec-skill">−</button>
+                    <span id="skillCurrent" class="value">—</span>
+                    <button class="step" data-action="inc-skill">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <h3>STAMINA</h3>
+              <div class="stat-row">
+                <div class="stat-col">
+                  <span class="label">Initial</span>
+                  <span id="staminaInitial" class="value">—</span>
+                </div>
+                <div class="stat-col">
+                  <span class="label">Current</span>
+                  <div class="stepper">
+                    <button class="step" data-action="dec-stamina">−</button>
+                    <span id="staminaCurrent" class="value">—</span>
+                    <button class="step" data-action="inc-stamina">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <h3>LUCK</h3>
+              <div class="stat-row">
+                <div class="stat-col">
+                  <span class="label">Initial</span>
+                  <span id="luckInitial" class="value">—</span>
+                </div>
+                <div class="stat-col">
+                  <span class="label">Current</span>
+                  <div class="stepper">
+                    <button class="step" data-action="dec-luck">−</button>
+                    <span id="luckCurrent" class="value">—</span>
+                    <button class="step" data-action="inc-luck">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat">
+              <h3>Provisions</h3>
+              <div class="stat-row">
+                <div class="stat-col">
+                  <span class="label">Meals</span>
+                  <div class="stepper">
+                    <button class="step" data-action="dec-provisions">−</button>
+                    <span id="provisions" class="value">10</span>
+                    <button class="step" data-action="inc-provisions">+</button>
+                  </div>
+                </div>
+                <div class="stat-col">
+                  <span class="label">Action</span>
+                  <button id="btnEat" class="primary">Eat (+4 STAMINA)</button>
+                </div>
+              </div>
+              <p class="hint">Eating uses 1 meal. STAMINA cannot exceed Initial STAMINA.</p>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="grid two">
+            <div class="card inner">
+              <h3>Gold</h3>
+              <div class="stepper big">
+                <button class="step" data-action="dec-gold">−</button>
+                <span id="gold" class="value">0</span>
+                <button class="step" data-action="inc-gold">+</button>
+              </div>
+            </div>
+
+            <div class="card inner">
+              <h3>Potion (choose ONE per adventure)</h3>
+              <div class="row">
+                <select id="potionSelect">
+                  <option value="none">None</option>
+                  <option value="skill">Potion of Skill (restore SKILL)</option>
+                  <option value="strength">Potion of Strength (restore STAMINA)</option>
+                  <option value="fortune">Potion of Fortune (+1 Initial LUCK, restore)</option>
+                </select>
+                <button id="btnUsePotion" class="primary">Use Potion</button>
+              </div>
+              <p id="potionStatus" class="hint">Potion not used.</p>
+            </div>
+          </div>
+
+          <div class="grid two">
+            <div class="card inner">
+              <div class="list-header">
+                <h3>Equipment</h3>
+                <div class="row">
+                  <input id="equipmentInput" type="text" placeholder="Add item (e.g., Sword, Rope)" />
+                  <button id="btnAddEquipment">Add</button>
+                </div>
+              </div>
+              <ul id="equipmentList" class="list"></ul>
+            </div>
+
+            <div class="card inner">
+              <div class="list-header">
+                <h3>Treasure</h3>
+                <div class="row">
+                  <input id="treasureInput" type="text" placeholder="Add treasure (e.g., Ruby, Idol)" />
+                  <button id="btnAddTreasure">Add</button>
+                </div>
+              </div>
+              <ul id="treasureList" class="list"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Luck Tests</h2>
+            <button id="btnTestLuck" class="primary">Test Your Luck (2d6)</button>
+          </div>
+          <div id="luckLog" class="log"></div>
+          <p class="hint">Every time you test luck, LUCK decreases by 1.</p>
+        </div>
+      </section>
+
+      <!-- ENCOUNTERS -->
+      <section id="tab-encounters" class="panel">
+        <div class="card">
+          <div class="card-header">
+            <h2>Monster Encounters</h2>
+            <button id="btnAddEncounter" class="primary">Add Monster</button>
+          </div>
+
+          <div id="encounterList" class="encounters"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Combat Helper</h2>
+            <div class="row">
+              <label class="checkbox">
+                <input id="chkUseLuck" type="checkbox" />
+                Use Luck this round (optional)
+              </label>
+              <button id="btnCombatRound" class="primary">Combat Round</button>
+            </div>
+          </div>
+
+          <div id="combatInfo" class="combat-info"></div>
+          <div id="combatLog" class="log"></div>
+
+          <p class="hint">
+            Attack Strength = 2d6 + SKILL. Winner deals 2 damage.
+            If using Luck: Lucky → stronger effect, Unlucky → weaker effect. Luck always -1 after test.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>LocalStorage Save Key: <code>ff_manager_state_v1</code></span>
+    </footer>
+  </section>
+
+  <!-- Dice Roller Modal -->
+  <div id="diceModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" id="diceModalBackdrop"></div>
+
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="diceModalTitle">
+      <div class="modal-header">
+        <h2 id="diceModalTitle">Dice Roller</h2>
+        <button id="btnDiceClose" class="small">Close</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="grid two">
+          <div class="card inner">
+            <h3>Dice Setup</h3>
+
+            <div class="row">
+              <label class="small-muted">Number of dice</label>
+              <select id="diceCount">
+                <option value="1">1 die</option>
+                <option value="2">2 dice</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <label class="small-muted">Die type</label>
+              <select id="diceSides">
+                <option value="6">d6</option>
+                <option value="8">d8</option>
+                <option value="10">d10</option>
+                <option value="12">d12</option>
+                <option value="20">d20</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <button id="btnDiceRoll" class="primary">Roll</button>
+              <button id="btnDiceClear">Clear</button>
+            </div>
+
+            <p class="hint">Roll up to 2 dice. Results are logged.</p>
+          </div>
+
+          <div class="card inner">
+            <h3>Result</h3>
+
+            <div class="dice-row">
+              <div class="dice-box">
+                <div class="dice-label">Die 1</div>
+                <div id="diceModalFace1" class="dice-face">—</div>
+              </div>
+
+              <div class="dice-box" id="diceFace2Box">
+                <div class="dice-label">Die 2</div>
+                <div id="diceModalFace2" class="dice-face">—</div>
+              </div>
+
+              <div class="dice-result">
+                <div class="small-muted">Total</div>
+                <div id="diceModalTotal" class="dice-total">—</div>
+              </div>
+            </div>
+
+            <div id="diceModalLog" class="log">No rolls yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
