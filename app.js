@@ -782,3 +782,12 @@ if (!hasSave()) {
   el("landingHint").textContent = "Save found ✅ You can Load Game or start New Game.";
   showScreen("landing");
 }
+/* -----------Service Worker --------*/
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then(() => console.log("Service Worker Registered"))
+      .catch((err) => console.error("SW registration failed:", err));
+  });
+}
